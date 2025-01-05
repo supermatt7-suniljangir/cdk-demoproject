@@ -42,7 +42,7 @@ export class PipelineStack extends cdk.Stack {
       })
     );
     pipeline.addStage(
-      new Stage(this, "DEV", {
+      new Stage(this, "PROD", {
         stageName: props?.stageName || STAGES.DEV,
         removalPolicy: props?.removalPolicy || cdk.RemovalPolicy.DESTROY,
       })
