@@ -6,7 +6,7 @@ import { STAGES } from "../utils/stages";
 const app = new App();
 
 function createPipelineStack(
-  stageName: string,
+  stageName: STAGES,
   removalPolicy: cdk.RemovalPolicy
 ): void {
   new PipelineStack(app, `PipelineStack-${stageName}`, {

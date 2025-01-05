@@ -5,17 +5,17 @@ import {
   CodePipelineSource,
   ShellStep,
 } from "aws-cdk-lib/pipelines";
+import { Stage } from "./stage";
+import { STAGES } from "../utils/stages";
 
 interface PipelineStackProps extends cdk.StackProps {
-  stageName: string;
+  stageName: STAGES;
   removalPolicy: cdk.RemovalPolicy;
 }
 
 export class PipelineStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: PipelineStackProps) {
     super(scope, id, props);
-
-    // Define the pipeline
     const pipeline = new CodePipeline(this, "Pipeline", {
       pipelineName: "MyPipeline",
       synth: new ShellStep("Synth", {
@@ -34,5 +34,19 @@ export class PipelineStack extends cdk.Stack {
         primaryOutputDirectory: "cdk.out",
       }),
     });
+
+    const devStage = pipeline.addStage(
+      new Stage(this, "DEV", {
+        stageName: props?.stageName || STAGES.DEV,
+        removalPolicy: cdk.RemovalPolicy.DESTROY,
+      })
+    );
+
+    const prodStage = pipeline.addStage(
+      new Stage(this, "PROD", {
+        stageName: props?.stageName || STAGES.PROD,
+        removalPolicy: cdk.RemovalPolicy.RETAIN,
+      })
+    );
   }
 }
