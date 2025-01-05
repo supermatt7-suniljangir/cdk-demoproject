@@ -35,17 +35,10 @@ export class PipelineStack extends cdk.Stack {
       }),
     });
 
-    const devStage = pipeline.addStage(
+    pipeline.addStage(
       new Stage(this, "DEV", {
         stageName: props?.stageName || STAGES.DEV,
-        removalPolicy: cdk.RemovalPolicy.DESTROY,
-      })
-    );
-
-    const prodStage = pipeline.addStage(
-      new Stage(this, "PROD", {
-        stageName: props?.stageName || STAGES.PROD,
-        removalPolicy: cdk.RemovalPolicy.RETAIN,
+        removalPolicy: props?.removalPolicy || cdk.RemovalPolicy.DESTROY,
       })
     );
   }
