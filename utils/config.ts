@@ -36,7 +36,7 @@ interface Config {
 }
 
 const config: Config = Object.freeze({
-  DEMO_TABLE_NAME: (stageName: string) => `${stageName}-demotable`,
+  DEMO_TABLE_NAME: (stageName: string) => `${stageName}-demotable-ddb`,
   USER_API_RATE_LIMIT: Object.freeze({
     dev: 100,
     prod: 1000,

@@ -11,13 +11,11 @@ interface StageProps {
 export class Stage extends cdk.Stage {
   constructor(scope: Construct, id: string, props: StageProps) {
     super(scope, id, props);
-    const {
-      stageName = "dev" as STAGES,
-      removalPolicy = cdk.RemovalPolicy.DESTROY,
-    } = props || {};
+    const { stageName, removalPolicy = cdk.RemovalPolicy.DESTROY } =
+      props || {};
 
-    const demoStack = new DemoAppStack(this, "DemoAppStack", {
-      stageName: stageName,
+    const demoStack = new DemoAppStack(this, `DemoStack-new-${stageName}`, {
+      stageName: stageName || STAGES.DEV,
       removalPolicy: removalPolicy,
     });
 

@@ -20,6 +20,6 @@ function createPipelineStack(
 }
 
 const devPipeline = createPipelineStack(STAGES.DEV, cdk.RemovalPolicy.DESTROY);
-const prodPipeline = createPipelineStack(STAGES.PROD, cdk.RemovalPolicy.RETAIN);
+// const prodPipeline = createPipelineStack(STAGES.PROD, cdk.RemovalPolicy.RETAIN);
 
 app.synth();

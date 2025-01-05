@@ -9,7 +9,6 @@ import * as iam from "aws-cdk-lib/aws-iam";
 import { aws_apigateway as apigateway } from "aws-cdk-lib";
 import { NodejsFunction, LogLevel } from "aws-cdk-lib/aws-lambda-nodejs";
 import path = require("path");
-import { commonNodeJsFunctionBundling } from "../utils/bundling";
 import config from "../utils/config";
 import { addCorsToResponses } from "../utils/others";
 import { STAGES } from "../utils/stages";
@@ -32,7 +31,7 @@ export class DemoAppStack extends cdk.Stack {
     });
 
     const queue = new Queue(this, "MyFirstQueue", {
-      queueName: "myfirstqueue",
+      queueName: `${stageName}-myFirstQueue`,
     });
 
     level2S3Bucket.addEventNotification(
@@ -47,19 +46,31 @@ export class DemoAppStack extends cdk.Stack {
         ),
       ],
     });
-
+    const commonBundling = {
+      minify: true,
+      externalModules: [
+        "@aws-sdk/client-dynamodb",
+        "@aws-sdk/lib-dynamodb",
+        "@aws-sdk/client-s3",
+        "@aws-sdk/client-secrets-manager",
+        "aws-cdk-lib",
+        "@aws-cdk",
+      ],
+      target: "es2020",
+      logLevel: LogLevel.INFO,
+    };
     //  create a new lambda
-    const myLambda = new NodejsFunction(this, "MyFirstLambda", {
+    const myLambda = new NodejsFunction(this, `${stageName}-demolambda`, {
       runtime: lambda.Runtime.NODEJS_20_X,
       handler: "handler",
-      entry: path.join(__dirname, "../lambda/demo/index.ts"),  // Just use entry instead of code
+      entry: path.join(__dirname, "../lambda/demo/index.ts"), // Just use entry instead of code
       environment: {
         DEMO_TABLE_NAME: config.DEMO_TABLE_NAME(stageName),
         JWT_SECRET_NAME: config.AWS_SECRET.JWT_SECRET(stageName),
         stageName: stageName,
       },
       role: lambdaRole,
-      bundling: commonNodeJsFunctionBundling,
+      bundling: commonBundling,
     });
 
     // Create an API Gateway REST API
