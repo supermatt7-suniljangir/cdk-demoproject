@@ -17,7 +17,7 @@ export class PipelineStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: PipelineStackProps) {
     super(scope, id, props);
     const pipeline = new CodePipeline(this, "Pipeline", {
-      pipelineName: "MyPipeline",
+      pipelineName: `pipeline-${props?.stageName || "dev"}`,
       synth: new ShellStep("Synth", {
         input: CodePipelineSource.gitHub(
           "supermatt7-suniljangir/cdk-demoproject",
@@ -35,6 +35,12 @@ export class PipelineStack extends cdk.Stack {
       }),
     });
 
+    pipeline.addStage(
+      new Stage(this, "DEV", {
+        stageName: props?.stageName || STAGES.DEV,
+        removalPolicy: props?.removalPolicy || cdk.RemovalPolicy.DESTROY,
+      })
+    );
     pipeline.addStage(
       new Stage(this, "DEV", {
         stageName: props?.stageName || STAGES.DEV,

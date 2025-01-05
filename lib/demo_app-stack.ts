@@ -52,9 +52,7 @@ export class DemoAppStack extends cdk.Stack {
     const myLambda = new NodejsFunction(this, "MyFirstLambda", {
       runtime: lambda.Runtime.NODEJS_20_X,
       handler: "handler",
-      code: lambda.Code.fromAsset(
-        path.join(__dirname, "../lambda/demo/index.ts")
-      ),
+      entry: path.join(__dirname, "../lambda/demo/index.ts"),  // Just use entry instead of code
       environment: {
         DEMO_TABLE_NAME: config.DEMO_TABLE_NAME(stageName),
         JWT_SECRET_NAME: config.AWS_SECRET.JWT_SECRET(stageName),
