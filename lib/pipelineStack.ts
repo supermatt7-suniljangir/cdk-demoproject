@@ -35,7 +35,7 @@ export class PipelineStack extends cdk.Stack {
       ],
     });
 
-    const pipeline = new CodePipeline(this, `MyPipelineID-${stageName}`, {
+    const pipeline = new CodePipeline(this, `MyPipelineID-${stageName}-unique`, {
       pipelineName: `MyCDKPipeline-${stageName}`,
       role: pipelineRole,
       synth: new ShellStep("Synth", {
