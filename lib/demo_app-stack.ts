@@ -24,20 +24,14 @@ export class DemoAppStack extends cdk.Stack {
     const { stageName = "dev", removalPolicy = cdk.RemovalPolicy.DESTROY } =
       props || {};
 
-    const level2S3Bucket = new Bucket(this, "myFirstLevel2S3Bucket", {
+    const level2S3Bucket = new Bucket(this, "uselessbucket348806", {
       versioned: true,
       bucketName: config.DEMO_TABLE_NAME(stageName),
       removalPolicy: removalPolicy,
     });
 
-    const queue = new Queue(this, "MyFirstQueue", {
-      queueName: `${stageName}-myFirstQueue`,
-    });
 
-    level2S3Bucket.addEventNotification(
-      s3.EventType.OBJECT_CREATED,
-      new s3n.SqsDestination(queue)
-    );
+   
     const lambdaRole = new iam.Role(this, "LambdaExecutionRole", {
       assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
       managedPolicies: [

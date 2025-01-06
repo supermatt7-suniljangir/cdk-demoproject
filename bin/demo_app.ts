@@ -13,7 +13,7 @@ function createPipelineStack(
     stageName,
     env: {
       account: process.env.CDK_DEFAULT_ACCOUNT || "225989334376",
-      region: process.env.CDK_DEFAULT_REGION || "eu-north-1",
+      region: process.env.CDK_DEFAULT_REGION || "us-east-1",
     },
     removalPolicy,
   });
