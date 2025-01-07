@@ -12,6 +12,7 @@ import path = require("path");
 import config from "../utils/config";
 import { addCorsToResponses } from "../utils/others";
 import { STAGES } from "../utils/stages";
+import { commonNodeJsFunctionBundling } from "../utils/bundling";
 
 interface DemoAppStackProps extends cdk.StackProps {
   stageName: STAGES;
@@ -21,17 +22,18 @@ interface DemoAppStackProps extends cdk.StackProps {
 export class DemoAppStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: DemoAppStackProps) {
     super(scope, id, props);
-    const { stageName = "dev", removalPolicy = cdk.RemovalPolicy.DESTROY } =
-      props || {};
+    const {
+      stageName = STAGES.DEV,
+      removalPolicy = cdk.RemovalPolicy.DESTROY,
+    } = props || {};
 
-    const level2S3Bucket = new Bucket(this, "uselessbucket348806", {
+    const level2S3Bucket = new Bucket(this, "demo-storage-bucket", {
       versioned: true,
-      bucketName: config.DEMO_TABLE_NAME(stageName),
+      bucketName: `demo-bucket-348806-unique`,
       removalPolicy: removalPolicy,
+      autoDeleteObjects: removalPolicy === cdk.RemovalPolicy.DESTROY,
     });
 
-
-   
     const lambdaRole = new iam.Role(this, "LambdaExecutionRole", {
       assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
       managedPolicies: [
@@ -40,23 +42,12 @@ export class DemoAppStack extends cdk.Stack {
         ),
       ],
     });
-    const commonBundling = {
-      minify: true,
-      externalModules: [
-        "@aws-sdk/client-dynamodb",
-        "@aws-sdk/lib-dynamodb",
-        "@aws-sdk/client-s3",
-        "@aws-sdk/client-secrets-manager",
-        "aws-cdk-lib",
-        "@aws-cdk",
-      ],
-      target: "es2020",
-      logLevel: LogLevel.INFO,
-    };
+
     //  create a new lambda
-    const myLambda = new NodejsFunction(this, `${stageName}-demolambda`, {
+    const myLambda = new NodejsFunction(this, `demolambda`, {
       runtime: lambda.Runtime.NODEJS_20_X,
       handler: "handler",
+      functionName: `demolambda-${stageName}`,
       entry: path.join(__dirname, "../lambda/demo/index.ts"), // Just use entry instead of code
       environment: {
         DEMO_TABLE_NAME: config.DEMO_TABLE_NAME(stageName),
@@ -64,12 +55,12 @@ export class DemoAppStack extends cdk.Stack {
         stageName: stageName,
       },
       role: lambdaRole,
-      bundling: commonBundling,
+      bundling: commonNodeJsFunctionBundling,
     });
 
     // Create an API Gateway REST API
     const api = new apigateway.RestApi(this, "demoApi", {
-      restApiName: `${stageName}-demoApi`,
+      restApiName: `demoApi-${stageName}`,
       defaultCorsPreflightOptions: config.DEFAULT_CORS_PREFLIGHT_OPTIONS,
       deployOptions: config.DEPLOY_OPTIONS[stageName],
     });

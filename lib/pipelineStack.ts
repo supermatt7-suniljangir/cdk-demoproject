@@ -1,13 +1,12 @@
 import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as iam from "aws-cdk-lib/aws-iam";
-
 import {
   CodePipeline,
   CodePipelineSource,
   ShellStep,
 } from "aws-cdk-lib/pipelines";
-import { Stage } from "./stage";
+import { PipelineStage } from "./pipelineStage";
 import { STAGES } from "../utils/stages";
 
 interface PipelineStackProps extends cdk.StackProps {
@@ -22,7 +21,8 @@ export class PipelineStack extends cdk.Stack {
       stageName = STAGES.DEV,
       removalPolicy = cdk.RemovalPolicy.DESTROY,
     } = props || {};
-    // Create an IAM role for the CDK pipeline with necessary permissions
+
+    // Include stageName in logical IDs to keep them unique across pipelines
     const pipelineRole = new iam.Role(this, `CDKPipelineRole-${stageName}`, {
       assumedBy: new iam.ServicePrincipal("codepipeline.amazonaws.com"),
       description: `Role used by CodePipeline to deploy CDK stacks for ${stageName}`,
@@ -35,8 +35,8 @@ export class PipelineStack extends cdk.Stack {
       ],
     });
 
-    const pipeline = new CodePipeline(this, `MyPipelineID-${stageName}-unique`, {
-      pipelineName: `MyCDKPipeline-${stageName}`,
+    const pipeline = new CodePipeline(this, `Pipeline-${stageName}`, {
+      pipelineName: `MyCDKPipeline-${stageName}-${cdk.Stack.of(this).account}`,
       role: pipelineRole,
       synth: new ShellStep("Synth", {
         input: CodePipelineSource.gitHub(
@@ -56,7 +56,7 @@ export class PipelineStack extends cdk.Stack {
     });
 
     pipeline.addStage(
-      new Stage(this, `CDK-Deployment-Stage-${stageName}`, {
+      new PipelineStage(this, `CDK-Deployment-Stage-${stageName}`, {
         stageName: stageName,
         removalPolicy: removalPolicy,
       })
