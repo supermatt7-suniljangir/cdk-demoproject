@@ -1,6 +1,6 @@
 import { Construct } from "constructs";
 import * as cdk from "aws-cdk-lib";
-import { DemoAppStack } from "./DemoStack";
+import { DemoAppStack } from "./demoStack";
 import { STAGES } from "../utils/stages";
 
 interface PipelineStageProps {

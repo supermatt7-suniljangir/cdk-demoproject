@@ -41,7 +41,7 @@ export class PipelineStack extends cdk.Stack {
       synth: new ShellStep("Synth", {
         input: CodePipelineSource.gitHub(
           "supermatt7-suniljangir/cdk-demoproject",
-          "main",
+          stageName === STAGES.DEV ? "main-dev" : "main",
           {
             authentication: cdk.SecretValue.secretsManager("CDK-GITHUB-TOKEN"),
           }
