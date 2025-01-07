@@ -29,7 +29,7 @@ export class DemoAppStack extends cdk.Stack {
 
     const level2S3Bucket = new Bucket(this, "demo-storage-bucket", {
       versioned: true,
-      bucketName: `mybucket-${stageName}`,
+      bucketName: `myuniquebucket-348806-${stageName}`,
       removalPolicy: removalPolicy,
       autoDeleteObjects: removalPolicy === cdk.RemovalPolicy.DESTROY,
     });
